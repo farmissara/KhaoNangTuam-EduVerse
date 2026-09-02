@@ -1,0 +1,6 @@
+{
+  "name": "KhaoNangTuam EduVerse (เขานางต่วม เอ็ดดูเวิร์ส)",
+  "description": "จักรวาลเกมการศึกษาและแบบทดสอบออนไลน์ โรงเรียนบ้านเขานางต่วม - คลังข้อสอบ ประลอง 4 ขุนเขา 9 เกมการศึกษา และระบบวัดผลสัมฤทธิ์อัจฉริยะ",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
