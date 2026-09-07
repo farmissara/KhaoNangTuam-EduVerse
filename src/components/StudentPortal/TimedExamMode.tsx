@@ -22,7 +22,18 @@ interface TimedExamModeProps {
 export const TimedExamMode: React.FC<TimedExamModeProps> = ({ onBack }) => {
   const { subjects, questions, currentStudent, submitAnswer, triggerConfetti, playSound, theme } = useApp();
 
-  const [selectedSubject, setSelectedSubject] = useState<Subject>(subjects[0]);
+  const fallbackSubject: Subject = subjects[0] || {
+    id: 'SUB_GENERAL',
+    name: 'วิชาทั่วไป',
+    code: 'GEN101',
+    description: 'แบบทดสอบความรู้ทั่วไป',
+    category: 'general',
+    color: '#6366f1',
+    icon: '📚',
+    totalQuestions: questions.length,
+    gradeLevel: 'ป.1'
+  };
+  const [selectedSubject, setSelectedSubject] = useState<Subject>(fallbackSubject);
   const [isExamStarted, setIsExamStarted] = useState<boolean>(false);
   const [currentIndex, setCurrentIndex] = useState<number>(0);
   const [selectedAnswers, setSelectedAnswers] = useState<{ [key: number]: number }>({});
@@ -31,7 +42,10 @@ export const TimedExamMode: React.FC<TimedExamModeProps> = ({ onBack }) => {
   const [isExamFinished, setIsExamFinished] = useState<boolean>(false);
   const [finalScore, setFinalScore] = useState<{ score: number; total: number; percent: number } | null>(null);
 
-  const subjectQuestions = questions.filter(q => q.subjectId === selectedSubject.id).slice(0, 5);
+  const activeSubjectId = selectedSubject?.id || fallbackSubject.id;
+  const subjectQuestions = (questions.filter(q => q.subjectId === activeSubjectId).length > 0
+    ? questions.filter(q => q.subjectId === activeSubjectId)
+    : questions).slice(0, 5);
 
   // Anti-Cheat: Detect Tab switching or blur event
   useEffect(() => {

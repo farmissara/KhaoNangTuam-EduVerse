@@ -33,9 +33,11 @@ import { ExportCenter } from './components/TeacherPortal/ExportCenter';
 import { ExamAnalyticsView } from './components/TeacherPortal/ExamAnalyticsView';
 import { AiQuizGenerator } from './components/TeacherPortal/AiQuizGenerator';
 import { WorksheetGenerator } from './components/TeacherPortal/WorksheetGenerator';
+import { AuthPortal } from './components/AuthPortal';
+import { GraduationCap, Palette, Volume2, VolumeX } from 'lucide-react';
 
 const MainAppContent: React.FC = () => {
-  const { role, theme } = useApp();
+  const { role, theme, isAuthenticated, setTheme, playSound } = useApp();
   const [activeTab, setActiveTab] = useState<string>(
     role === 'student' ? 'student-dashboard' : 'teacher-dashboard'
   );
@@ -123,101 +125,158 @@ const MainAppContent: React.FC = () => {
           <div className="absolute top-2/3 left-1/2 w-64 h-64 rounded-full bg-amber-500/15 blur-3xl animate-float-slow" />
         </div>
       )}
-      {/* Top Navbar */}
-      <Navbar
-        onOpenThemeModal={() => setIsThemeModalOpen(true)}
-        onOpenGasModal={() => setIsGasModalOpen(true)}
-        activeTab={activeTab}
-        setActiveTab={setActiveTab}
-      />
+      {/* Top Navbar or Secure Auth Header */}
+      {!isAuthenticated ? (
+        <header className="sticky top-0 z-30 w-full backdrop-blur-xl bg-slate-900/90 border-b border-slate-800/80 text-white shadow-lg shadow-black/20">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 py-2.5 flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-2xl bg-gradient-to-tr from-indigo-600 via-indigo-500 to-pink-500 p-0.5 shadow-md shadow-indigo-500/30">
+                <div className="w-full h-full bg-slate-950 rounded-[14px] flex items-center justify-center">
+                  <GraduationCap className="w-5 h-5 text-indigo-400" />
+                </div>
+              </div>
+              <div>
+                <div className="flex items-center gap-2">
+                  <span className="font-extrabold text-base sm:text-lg tracking-tight bg-gradient-to-r from-white via-indigo-200 to-indigo-400 bg-clip-text text-transparent">
+                    EduQuest
+                  </span>
+                  <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
+                    เข้าสู่ระบบ
+                  </span>
+                </div>
+                <p className="text-[11px] text-slate-400">
+                  โรงเรียนบ้านเขานางต่วม
+                </p>
+              </div>
+            </div>
+
+            <div className="flex items-center gap-2">
+              <button
+                onClick={() => setIsThemeModalOpen(true)}
+                className="p-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 transition-colors cursor-pointer"
+                title="เปลี่ยนธีมสี"
+              >
+                <Palette className="w-4 h-4" />
+              </button>
+              <button
+                onClick={() => {
+                  playSound('click');
+                  setTheme(prev => ({ ...prev, soundEnabled: !prev.soundEnabled }));
+                }}
+                className="p-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 transition-colors cursor-pointer"
+                title={theme.soundEnabled ? 'ปิดเสียง' : 'เปิดเสียง'}
+              >
+                {theme.soundEnabled ? (
+                  <Volume2 className="w-4 h-4 text-emerald-400" />
+                ) : (
+                  <VolumeX className="w-4 h-4 text-slate-500" />
+                )}
+              </button>
+            </div>
+          </div>
+        </header>
+      ) : (
+        <Navbar
+          onOpenThemeModal={() => setIsThemeModalOpen(true)}
+          onOpenGasModal={() => setIsGasModalOpen(true)}
+          activeTab={activeTab}
+          setActiveTab={setActiveTab}
+        />
+      )}
 
       {/* Main Content Area */}
-      <main className="flex-1 max-w-7xl w-full mx-auto px-3 sm:px-6 lg:px-8 py-6">
-        {/* Student Views */}
-        {role === 'student' && (
-          <>
-            {(activeTab === 'student-dashboard' || activeTab === 'dashboard') && (
-              <StudentDashboard
-                onGoToBattle={() => setActiveTab('battle-arena')}
-                onGoToLeaderboard={() => setActiveTab('leaderboard')}
-                onGoToMatchingGame={() => setActiveTab('matching-game')}
-                onGoToSurvivalBoss={() => setActiveTab('survival-boss')}
-                onGoToTowerClimb={() => setActiveTab('tower-climb')}
-                onGoToCrossword={() => setActiveTab('crossword-game')}
-                onGoToBombDefusal={() => setActiveTab('bomb-defusal')}
-                onGoToFlashcardSwipe={() => setActiveTab('flashcard-swipe')}
-                onGoToTreasureMaze={() => setActiveTab('treasure-maze')}
-                onGoToMistakeNotebook={() => setActiveTab('mistake-notebook')}
-                onGoToAvatarShop={() => setActiveTab('avatar-shop')}
-                onGoToCertificates={() => setActiveTab('certificates')}
-                onGoToLearningPath={() => setActiveTab('learning-path')}
-                onGoToTimedExam={() => setActiveTab('timed-exam')}
-              />
-            )}
-            {activeTab === 'matching-game' && (
-              <MatchingGame onBack={() => setActiveTab('student-dashboard')} />
-            )}
-            {activeTab === 'survival-boss' && (
-              <SurvivalBossGame onBack={() => setActiveTab('student-dashboard')} />
-            )}
-            {activeTab === 'tower-climb' && (
-              <TowerClimbGame onBack={() => setActiveTab('student-dashboard')} />
-            )}
-            {activeTab === 'crossword-game' && (
-              <CrosswordGame onBack={() => setActiveTab('student-dashboard')} />
-            )}
-            {activeTab === 'bomb-defusal' && (
-              <BombDefusalGame onBack={() => setActiveTab('student-dashboard')} />
-            )}
-            {activeTab === 'flashcard-swipe' && (
-              <FlashcardSwipeGame onBack={() => setActiveTab('student-dashboard')} />
-            )}
-            {activeTab === 'treasure-maze' && (
-              <TreasureMazeGame onBack={() => setActiveTab('student-dashboard')} />
-            )}
-            {activeTab === 'mistake-notebook' && (
-              <MistakeNotebook onBack={() => setActiveTab('student-dashboard')} />
-            )}
-            {activeTab === 'avatar-shop' && (
-              <AvatarShop onBack={() => setActiveTab('student-dashboard')} />
-            )}
-            {activeTab === 'certificates' && (
-              <CertificateViewer onBack={() => setActiveTab('student-dashboard')} />
-            )}
-            {activeTab === 'learning-path' && (
-              <LearningPathView onBack={() => setActiveTab('student-dashboard')} />
-            )}
-            {activeTab === 'timed-exam' && (
-              <TimedExamMode onBack={() => setActiveTab('student-dashboard')} />
-            )}
-            {(activeTab === 'battle-arena' || activeTab === 'battle') && <BattleArena />}
-            {activeTab === 'leaderboard' && <LeaderboardView />}
-          </>
-        )}
+      {!isAuthenticated ? (
+        <main className="flex-1 flex items-center justify-center py-6 px-3 sm:px-6">
+          <AuthPortal onLoginSuccess={() => setActiveTab(role === 'student' ? 'student-dashboard' : 'teacher-dashboard')} />
+        </main>
+      ) : (
+        <main className="flex-1 max-w-7xl w-full mx-auto px-3 sm:px-6 lg:px-8 py-6">
+          {/* Student Views */}
+          {role === 'student' && (
+            <>
+              {(activeTab === 'student-dashboard' || activeTab === 'dashboard') && (
+                <StudentDashboard
+                  onGoToBattle={() => setActiveTab('battle-arena')}
+                  onGoToLeaderboard={() => setActiveTab('leaderboard')}
+                  onGoToMatchingGame={() => setActiveTab('matching-game')}
+                  onGoToSurvivalBoss={() => setActiveTab('survival-boss')}
+                  onGoToTowerClimb={() => setActiveTab('tower-climb')}
+                  onGoToCrossword={() => setActiveTab('crossword-game')}
+                  onGoToBombDefusal={() => setActiveTab('bomb-defusal')}
+                  onGoToFlashcardSwipe={() => setActiveTab('flashcard-swipe')}
+                  onGoToTreasureMaze={() => setActiveTab('treasure-maze')}
+                  onGoToMistakeNotebook={() => setActiveTab('mistake-notebook')}
+                  onGoToAvatarShop={() => setActiveTab('avatar-shop')}
+                  onGoToCertificates={() => setActiveTab('certificates')}
+                  onGoToLearningPath={() => setActiveTab('learning-path')}
+                  onGoToTimedExam={() => setActiveTab('timed-exam')}
+                />
+              )}
+              {activeTab === 'matching-game' && (
+                <MatchingGame onBack={() => setActiveTab('student-dashboard')} />
+              )}
+              {activeTab === 'survival-boss' && (
+                <SurvivalBossGame onBack={() => setActiveTab('student-dashboard')} />
+              )}
+              {activeTab === 'tower-climb' && (
+                <TowerClimbGame onBack={() => setActiveTab('student-dashboard')} />
+              )}
+              {activeTab === 'crossword-game' && (
+                <CrosswordGame onBack={() => setActiveTab('student-dashboard')} />
+              )}
+              {activeTab === 'bomb-defusal' && (
+                <BombDefusalGame onBack={() => setActiveTab('student-dashboard')} />
+              )}
+              {activeTab === 'flashcard-swipe' && (
+                <FlashcardSwipeGame onBack={() => setActiveTab('student-dashboard')} />
+              )}
+              {activeTab === 'treasure-maze' && (
+                <TreasureMazeGame onBack={() => setActiveTab('student-dashboard')} />
+              )}
+              {activeTab === 'mistake-notebook' && (
+                <MistakeNotebook onBack={() => setActiveTab('student-dashboard')} />
+              )}
+              {activeTab === 'avatar-shop' && (
+                <AvatarShop onBack={() => setActiveTab('student-dashboard')} />
+              )}
+              {activeTab === 'certificates' && (
+                <CertificateViewer onBack={() => setActiveTab('student-dashboard')} />
+              )}
+              {activeTab === 'learning-path' && (
+                <LearningPathView onBack={() => setActiveTab('student-dashboard')} />
+              )}
+              {activeTab === 'timed-exam' && (
+                <TimedExamMode onBack={() => setActiveTab('student-dashboard')} />
+              )}
+              {(activeTab === 'battle-arena' || activeTab === 'battle') && <BattleArena />}
+              {activeTab === 'leaderboard' && <LeaderboardView />}
+            </>
+          )}
 
-        {/* Teacher Views */}
-        {role === 'teacher' && (
-          <>
-            {activeTab === 'teacher-dashboard' && (
-              <TeacherDashboard
-                onNavigateTab={tab => setActiveTab(tab)}
-                onOpenGasModal={() => setIsGasModalOpen(true)}
-              />
-            )}
-            {activeTab === 'exam-analytics' && <ExamAnalyticsView />}
-            {activeTab === 'ai-quiz-generator' && (
-              <AiQuizGenerator onNavigateToBank={() => setActiveTab('question-bank')} />
-            )}
-            {activeTab === 'worksheet-generator' && <WorksheetGenerator />}
-            {activeTab === 'subject-manager' && <SubjectManager />}
-            {activeTab === 'assignment-manager' && <AssignmentManager />}
-            {activeTab === 'question-bank' && <QuestionBankManager />}
-            {activeTab === 'student-manager' && <StudentManager />}
-            {activeTab === 'teacher-manager' && <TeacherManager />}
-            {activeTab === 'export-center' && <ExportCenter />}
-          </>
-        )}
-      </main>
+          {/* Teacher Views */}
+          {role === 'teacher' && (
+            <>
+              {activeTab === 'teacher-dashboard' && (
+                <TeacherDashboard
+                  onNavigateTab={tab => setActiveTab(tab)}
+                  onOpenGasModal={() => setIsGasModalOpen(true)}
+                />
+              )}
+              {activeTab === 'exam-analytics' && <ExamAnalyticsView />}
+              {activeTab === 'ai-quiz-generator' && (
+                <AiQuizGenerator onNavigateToBank={() => setActiveTab('question-bank')} />
+              )}
+              {activeTab === 'worksheet-generator' && <WorksheetGenerator />}
+              {activeTab === 'subject-manager' && <SubjectManager />}
+              {activeTab === 'assignment-manager' && <AssignmentManager />}
+              {activeTab === 'question-bank' && <QuestionBankManager />}
+              {activeTab === 'student-manager' && <StudentManager />}
+              {activeTab === 'teacher-manager' && <TeacherManager />}
+              {activeTab === 'export-center' && <ExportCenter />}
+            </>
+          )}
+        </main>
+      )}
 
       {/* Floating Animated Mascot Assistant */}
       <MascotGuide />

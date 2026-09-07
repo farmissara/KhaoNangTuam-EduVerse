@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion } from 'motion/react';
 import { useApp } from '../../context/AppContext';
 import { Subject, Question, Assignment } from '../../types';
@@ -28,7 +28,9 @@ import {
   Gamepad2,
   Trophy,
   RotateCcw,
-  Star
+  Star,
+  Database,
+  RefreshCw
 } from 'lucide-react';
 
 interface StudentDashboardProps {
@@ -73,8 +75,20 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({
     assignmentSubmissions,
     playSound,
     triggerMascotTip,
-    theme
+    theme,
+    gasUrl,
+    isGasConnected,
+    isSyncing,
+    lastSyncTime,
+    fetchDataFromGas
   } = useApp();
+
+  // Auto-pull fresh data directly from Google Sheets when opening StudentDashboard
+  useEffect(() => {
+    if (gasUrl) {
+      fetchDataFromGas(gasUrl, true);
+    }
+  }, [gasUrl]);
 
   const [selectedSubject, setSelectedSubject] = useState<Subject | null>(null);
   const [activeAssignment, setActiveAssignment] = useState<Assignment | null>(null);
@@ -82,7 +96,7 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({
   const [activeGameCategory, setActiveGameCategory] = useState<'all' | 'speed' | 'puzzle' | 'adventure' | 'quiz'>('all');
 
   // Mistakes count for current student
-  const mistakeCount = answerLogs.filter(l => l.studentId === currentStudent.id && !l.isCorrect).length;
+  const mistakeCount = answerLogs.filter(l => l.studentId === currentStudent?.id && !l.isCorrect).length;
 
   const isLightTheme = [
     'daylight-white',
@@ -150,18 +164,41 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({
     );
   }
 
+  // Safe Student Data Fallback
+  const student = currentStudent || {
+    id: 'STD_GUEST',
+    studentCode: '1001',
+    prefix: 'ด.ช.',
+    firstName: 'นักเรียน',
+    lastName: '',
+    classroom: 'ป.1/1',
+    number: 1,
+    avatar: '🌱',
+    level: 1,
+    xp: 0,
+    coins: 0,
+    streakDays: 0,
+    title: 'นักเรียนยอดนักสู้',
+    clanId: 'fire',
+    completedQuizzes: 0,
+    battleWins: 0,
+    battleLosses: 0,
+    accuracy: 100,
+    badgeIds: []
+  };
+
   // Filter assignments relevant to this student
   const studentAssignments = assignments.filter(
     a =>
       a.targetType === 'all' ||
-      (a.targetType === 'classroom' && a.targetClassroom === currentStudent.classroom) ||
-      (a.targetType === 'individual' && a.targetStudentId === currentStudent.id)
+      (a.targetType === 'classroom' && a.targetClassroom === student.classroom) ||
+      (a.targetType === 'individual' && a.targetStudentId === student.id)
   );
 
   // Level XP Progress math
-  const currentLevelBaseXp = (currentStudent.level - 1) * 500;
-  const nextLevelXp = currentStudent.level * 500;
-  const progressInLevel = currentStudent.xp - currentLevelBaseXp;
+  const currentLevelBaseXp = (student.level - 1) * 500;
+  const nextLevelXp = student.level * 500;
+  const progressInLevel = Math.max(0, student.xp - currentLevelBaseXp);
   const levelProgressPercent = Math.min(100, Math.max(0, Math.round((progressInLevel / 500) * 100)));
 
   return (
@@ -180,36 +217,36 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({
                 <div className={`w-full h-full rounded-[22px] flex items-center justify-center text-3xl sm:text-4xl ${
                   isLightTheme ? 'bg-slate-50' : 'bg-slate-950'
                 }`}>
-                  {currentStudent.avatar}
+                  {student.avatar || '🌱'}
                 </div>
               </div>
               <span className="absolute -bottom-1 -right-1 px-2.5 py-0.5 rounded-full bg-gradient-to-r from-amber-500 to-orange-500 text-slate-950 text-[10px] font-black shadow border border-amber-300">
-                Lv.{currentStudent.level}
+                Lv.{student.level}
               </span>
             </div>
 
             <div className="flex-1">
               <div className="flex flex-wrap items-center gap-2 justify-center sm:justify-start">
                 <h1 className="text-xl sm:text-2xl font-black">
-                  {currentStudent.prefix}{currentStudent.firstName} {currentStudent.lastName}
+                  {student.prefix}{student.firstName} {student.lastName}
                 </h1>
                 <span className="text-xs px-2.5 py-0.5 rounded-full bg-indigo-500/20 text-indigo-300 font-bold border border-indigo-500/30">
-                  {currentStudent.classroom} (เลขที่ {currentStudent.number})
+                  {student.classroom} (เลขที่ {student.number})
                 </span>
               </div>
               <p className="text-xs text-slate-400 mt-0.5">
-                ฉายา: <span className="text-amber-400 font-bold">{currentStudent.title}</span> • รหัส <span className="font-mono">{currentStudent.studentId}</span>
+                ฉายา: <span className="text-amber-400 font-bold">{student.title}</span> • รหัส <span className="font-mono">{student.studentCode || student.id}</span>
               </p>
 
               {/* Status Chips */}
               <div className="flex flex-wrap items-center gap-2 mt-2 justify-center sm:justify-start">
                 <span className="flex items-center gap-1 text-xs font-bold text-amber-400 bg-amber-500/10 px-2.5 py-0.5 rounded-full border border-amber-500/20">
                   <Flame className="w-3.5 h-3.5 fill-amber-400" />
-                  Streak {currentStudent.streakDays} วัน
+                  Streak {student.streakDays} วัน
                 </span>
                 <span className="flex items-center gap-1 text-xs font-bold text-yellow-400 bg-yellow-500/10 px-2.5 py-0.5 rounded-full border border-yellow-500/20">
                   <Coins className="w-3.5 h-3.5" />
-                  {currentStudent.coins} เหรียญ
+                  {student.coins} เหรียญ
                 </span>
                 {mistakeCount > 0 && (
                   <button
@@ -232,7 +269,7 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({
             <div className="flex items-center justify-between text-xs mb-2 font-semibold">
               <span className="flex items-center gap-1.5 text-indigo-400 font-bold">
                 <Sparkles className="w-3.5 h-3.5 text-amber-400" />
-                เลเวล {currentStudent.level}
+                เลเวล {student.level}
               </span>
               <span className={isLightTheme ? 'text-slate-700' : 'text-slate-300'}>
                 {progressInLevel} / 500 XP
@@ -249,8 +286,8 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({
               </motion.div>
             </div>
             <div className="flex items-center justify-between text-[10px] text-slate-400 mt-1">
-              <span>{levelProgressPercent}% สู่เลเวล {currentStudent.level + 1}</span>
-              <span className="text-amber-400 font-bold">รวม {currentStudent.xp} XP</span>
+              <span>{levelProgressPercent}% สู่เลเวล {student.level + 1}</span>
+              <span className="text-amber-400 font-bold">รวม {student.xp} XP</span>
             </div>
           </div>
         </div>
@@ -390,6 +427,25 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({
             <Award className="w-3.5 h-3.5 text-amber-400" />
             <span>อันดับ</span>
           </button>
+
+          {gasUrl && (
+            <button
+              onClick={() => {
+                playSound('click');
+                fetchDataFromGas(gasUrl, false);
+              }}
+              disabled={isSyncing}
+              title={`ซิงค์ข้อมูลล่าสุดจาก Google Sheets (ซิงค์ล่าสุด: ${lastSyncTime ? lastSyncTime.toLocaleTimeString('th-TH') : 'ยังไม่ระบุ'})`}
+              className={`px-3 py-1.5 rounded-xl border text-xs font-semibold flex items-center gap-1.5 cursor-pointer transition-all ${
+                isGasConnected
+                  ? 'bg-emerald-950/70 border-emerald-700/60 text-emerald-300 hover:bg-emerald-900/80'
+                  : 'bg-amber-950/70 border-amber-700/60 text-amber-300 hover:bg-amber-900/80'
+              }`}
+            >
+              <RefreshCw className={`w-3.5 h-3.5 ${isSyncing ? 'animate-spin text-amber-400' : isGasConnected ? 'text-emerald-400' : 'text-amber-400'}`} />
+              <span className="hidden sm:inline">{isSyncing ? 'กำลังซิงค์...' : 'Google Sheets'}</span>
+            </button>
+          )}
         </div>
       </div>
 
@@ -827,7 +883,7 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({
               <div className="grid grid-cols-1 md:grid-cols-2 gap-3.5">
                 {studentAssignments.map(assign => {
                   const submission = assignmentSubmissions.find(
-                    s => s.assignmentId === assign.id && s.studentId === currentStudent.id
+                    s => s.assignmentId === assign.id && s.studentId === student.id
                   );
                   const isSubmitted = !!submission;
 
@@ -917,7 +973,7 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({
                     <div className="text-[10px] text-slate-400">รางวัล: +80 XP, 20 🪙</div>
                   </div>
                 </div>
-                <span className="text-amber-400 text-xs font-bold">{currentStudent.battleWins > 0 ? '1/1 ✅' : '0/1'}</span>
+                <span className="text-amber-400 text-xs font-bold">{student.battleWins > 0 ? '1/1 ✅' : '0/1'}</span>
               </div>
 
               <div className="p-3.5 rounded-2xl bg-slate-800/60 border border-slate-700 flex items-center justify-between">
@@ -926,7 +982,7 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({
                     🔥
                   </div>
                   <div>
-                    <div className="text-xs font-semibold text-white">ล็อกอินต่อเนื่อง {currentStudent.streakDays} วัน</div>
+                    <div className="text-xs font-semibold text-white">ล็อกอินต่อเนื่อง {student.streakDays} วัน</div>
                     <div className="text-[10px] text-slate-400">รางวัล: +30 XP</div>
                   </div>
                 </div>
@@ -1056,11 +1112,11 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({
               </div>
               <div className="p-3.5 rounded-2xl bg-slate-900/80 border border-slate-800">
                 <div className="text-[11px] text-slate-400">อัตราความแม่นยำรวม</div>
-                <div className="text-xl font-black text-emerald-400 mt-0.5">{currentStudent.accuracyRate}%</div>
+                <div className="text-xl font-black text-emerald-400 mt-0.5">{student.accuracy}%</div>
               </div>
               <div className="p-3.5 rounded-2xl bg-slate-900/80 border border-slate-800">
                 <div className="text-[11px] text-slate-400">ทำแบบทดสอบจบแล้ว</div>
-                <div className="text-xl font-black text-amber-400 mt-0.5">{currentStudent.totalQuizzesTaken} ครั้ง</div>
+                <div className="text-xl font-black text-amber-400 mt-0.5">{student.completedQuizzes} ครั้ง</div>
               </div>
             </div>
           </div>
@@ -1087,8 +1143,8 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({
                 <div className="flex items-center gap-3">
                   <span className="text-2xl">🥇</span>
                   <div>
-                    <div className="text-sm font-bold text-white">อันดับห้อง {currentStudent.classroom}</div>
-                    <div className="text-xs text-slate-400">สะสม {currentStudent.xp} XP • {currentStudent.coins} 🪙</div>
+                    <div className="text-sm font-bold text-white">อันดับห้อง {student.classroom}</div>
+                    <div className="text-xs text-slate-400">สะสม {student.xp} XP • {student.coins} 🪙</div>
                   </div>
                 </div>
                 <span className="px-2.5 py-1 rounded-xl bg-amber-500/20 text-amber-300 text-xs font-bold border border-amber-500/30">
@@ -1107,11 +1163,11 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({
               <div className="grid grid-cols-2 gap-2.5">
                 <div className="p-3 rounded-2xl bg-slate-800/50 border border-slate-700/60 text-center">
                   <div className="text-[10px] text-slate-400">ชนะประลอง (Wins)</div>
-                  <div className="text-lg font-black text-emerald-400">{currentStudent.battleWins} ครั้ง</div>
+                  <div className="text-lg font-black text-emerald-400">{student.battleWins} ครั้ง</div>
                 </div>
                 <div className="p-3 rounded-2xl bg-slate-800/50 border border-slate-700/60 text-center">
                   <div className="text-[10px] text-slate-400">แพ้ประลอง (Losses)</div>
-                  <div className="text-lg font-black text-rose-400">{currentStudent.battleLosses} ครั้ง</div>
+                  <div className="text-lg font-black text-rose-400">{student.battleLosses} ครั้ง</div>
                 </div>
               </div>
             </div>

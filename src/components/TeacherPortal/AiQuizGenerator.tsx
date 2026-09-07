@@ -47,7 +47,7 @@ export const AiQuizGenerator: React.FC<AiQuizGeneratorProps> = ({ onNavigateToBa
           subjectName: selectedSubject.name,
           gradeLevel,
           questionText: `[AI วิเคราะห์ตัวชี้วัด] ในหัวข้อเรื่อง "${topic}" หากสิ่งมีชีวิตขาดออร์แกเนลล์คลอโรพลาสต์ จะส่งผลกระทบต่อกระบวนการใดโดยตรงที่สุด?`,
-          type: 'multiple_choice',
+          type: 'multiple_choice' as const,
           options: [
             'การสังเคราะห์ด้วยแสงเพื่อสร้างอาหารและพลังงาน',
             'การสร้างโปรตีนเพื่อซ่อมแซมส่วนที่สึกหรอ',
@@ -65,7 +65,7 @@ export const AiQuizGenerator: React.FC<AiQuizGeneratorProps> = ({ onNavigateToBa
           subjectName: selectedSubject.name,
           gradeLevel,
           questionText: `[AI ข้อสอบประยุกต์] ข้อใดกล่าวถึงความสัมพันธ์ของ "${topic}" ได้ถูกต้องตามหลักการทางวิชาการมากที่สุด?`,
-          type: 'multiple_choice',
+          type: 'multiple_choice' as const,
           options: [
             'เซลล์พืชมีผนังเซลล์ที่ให้ความแข็งแรง แต่เซลล์สัตว์ไม่มี',
             'เซลล์สัตว์สามารถสร้างอาหารได้เองผ่านการดูดกลืนแสง',
@@ -83,11 +83,11 @@ export const AiQuizGenerator: React.FC<AiQuizGeneratorProps> = ({ onNavigateToBa
           subjectName: selectedSubject.name,
           gradeLevel,
           questionText: `[AI จริงหรือเท็จ] ในกระบวนการทำงานของ "${topic}" นิวเคลียสทำหน้าที่เป็นศูนย์กลางควบคุมพันธุกรรมและการทำงานทั้งหมดของเซลล์`,
-          type: 'true_false',
+          type: 'true_false' as const,
           options: ['จริง (True)', 'เท็จ (False)'],
           correctIndex: 0,
           explanation: 'ถูกต้อง นิวเคลียสบรรจุสารพันธุกรรม DNA ทำหน้าที่ควบคุมกระบวนการและการสังเคราะห์สารเคมีทุกชนิดในเซลล์',
-          difficulty: 'easy',
+          difficulty: 'easy' as const,
           timeLimitSeconds: 20,
           tags: ['AI-Generated', topic, 'True-False']
         }

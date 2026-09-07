@@ -41,6 +41,7 @@ export interface Student {
   battleLosses: number;
   accuracy: number;
   badgeIds: string[];
+  pin?: string; // Optional student PIN code
 }
 
 export interface Teacher {
@@ -48,12 +49,13 @@ export interface Teacher {
   prefix: string;
   firstName: string;
   lastName: string;
-  role: 'ผู้ดูแลระบบ' | 'หัวหน้างานวิชาการ' | 'ครูผู้สอน' | 'ครูประจำชั้น';
+  role: 'ผู้ดูแลระบบ' | 'หัวหน้างานวิชาการ' | 'ครูผู้สอน' | 'ครูประจำชั้น' | 'ผู้ดูแลระบบและครูผู้สอน' | string;
   department: string;
   email?: string;
   assignedSubjects: string[];
   openRouterKey?: string;
   deepSeekKey?: string;
+  pin?: string;
 }
 
 export interface Subject {
@@ -202,6 +204,7 @@ export interface AnswerLog {
   questionText?: string;
   subjectId: string;
   subjectName: string;
+  teacherName?: string;
   selectedOption: number;
   selectedOptionText?: string;
   correctOption?: number;

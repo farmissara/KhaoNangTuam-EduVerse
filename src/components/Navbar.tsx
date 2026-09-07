@@ -23,9 +23,13 @@ import {
   Clock,
   Layers,
   Send,
-  Printer
+  Printer,
+  Database,
+  LogOut,
+  Lock
 } from 'lucide-react';
 import { Role } from '../types';
+import { TeacherPinModal } from './TeacherPinModal';
 
 interface NavbarProps {
   onOpenThemeModal: () => void;
@@ -55,32 +59,47 @@ export const Navbar: React.FC<NavbarProps> = ({
     theme,
     setTheme,
     playSound,
-    triggerMascotTip
+    triggerMascotTip,
+    isGasConnected,
+    logout
   } = useApp();
 
   const [showAccountDropdown, setShowAccountDropdown] = useState(false);
   const [showNotificationDropdown, setShowNotificationDropdown] = useState(false);
+  const [isTeacherPinModalOpen, setIsTeacherPinModalOpen] = useState(false);
 
   // Filter notifications for current user
   const userNotifications = notifications.filter(
     n =>
       n.recipientRole === 'all' ||
       n.recipientRole === role ||
-      n.recipientId === (role === 'student' ? currentStudent.id : currentTeacher.teacherId)
+      n.recipientId === (role === 'student' ? currentStudent?.id : currentTeacher?.teacherId)
   );
 
   const unreadCount = userNotifications.filter(n => !n.isRead).length;
 
   const handleRoleChange = (newRole: Role) => {
+    // If switching to Teacher role from Student, require PIN verification
+    if (newRole === 'teacher' && role !== 'teacher') {
+      setIsTeacherPinModalOpen(true);
+      return;
+    }
+
     playSound('click');
     setRole(newRole);
     if (newRole === 'student') {
       setActiveTab('student-dashboard');
-      triggerMascotTip(`ยินดีต้อนรับ ${currentStudent.prefix}${currentStudent.firstName}! พร้อมลุยทำเควสต์วันนี้แล้วหรือยัง? 🎒`, 'happy');
+      triggerMascotTip(`ยินดีต้อนรับ ${currentStudent?.prefix || ''}${currentStudent?.firstName || 'นักเรียน'}! พร้อมลุยทำเควสต์วันนี้แล้วหรือยัง? 🎒`, 'happy');
     } else {
       setActiveTab('teacher-dashboard');
-      triggerMascotTip(`ยินดีต้อนรับ ${currentTeacher.prefix}${currentTeacher.firstName} ${currentTeacher.lastName} (${currentTeacher.role}) ครับอาจารย์! 🎓`, 'proud');
+      triggerMascotTip(`ยินดีต้อนรับ ${currentTeacher?.prefix || 'ครู'}${currentTeacher?.firstName || ''} ${currentTeacher?.lastName || ''} (${currentTeacher?.role || 'คุณครู'}) ครับอาจารย์! 🎓`, 'proud');
     }
+  };
+
+  const handleTeacherPinSuccess = () => {
+    setRole('teacher');
+    setActiveTab('teacher-dashboard');
+    triggerMascotTip(`ยืนยันรหัส PIN ถูกต้อง! ยินดีต้อนรับ ${currentTeacher?.prefix || 'ครู'}${currentTeacher?.firstName || ''} เข้าสู่ระบบบริหารจัดการ 🎓`, 'proud');
   };
 
   const getButtonRadiusClass = () => {
@@ -333,26 +352,26 @@ export const Navbar: React.FC<NavbarProps> = ({
             <div className="hidden sm:flex items-center gap-3 px-3 py-1 rounded-2xl bg-slate-800/80 border border-slate-700 text-xs">
               <div className="flex items-center gap-1 text-amber-400 font-bold" title="Streak ต่อเนื่อง">
                 <Flame className="w-3.5 h-3.5 fill-amber-400 text-amber-400" />
-                <span>{currentStudent.streakDays} วัน</span>
+                <span>{currentStudent?.streakDays ?? 0} วัน</span>
               </div>
               <div className="h-3 w-[1px] bg-slate-700" />
               <div className="flex items-center gap-1 text-yellow-400 font-bold" title="เหรียญรางวัล">
                 <Coins className="w-3.5 h-3.5 text-yellow-400" />
-                <span>{currentStudent.coins}</span>
+                <span>{currentStudent?.coins ?? 0}</span>
               </div>
               <div className="h-3 w-[1px] bg-slate-700" />
               <div className="flex items-center gap-1.5 font-bold text-indigo-300" title="เลเวล">
                 <span className="px-1.5 py-0.2 rounded-md bg-indigo-600 text-white text-[10px]">
-                  Lv.{currentStudent.level}
+                  Lv.{currentStudent?.level ?? 1}
                 </span>
-                <span className="text-[11px] font-normal text-slate-300">{currentStudent.xp} XP</span>
+                <span className="text-[11px] font-normal text-slate-300">{currentStudent?.xp ?? 0} XP</span>
               </div>
             </div>
           ) : (
             <div className="hidden sm:flex items-center gap-2 px-3 py-1 rounded-2xl bg-indigo-950/60 border border-indigo-800/60 text-xs text-indigo-300">
               <Shield className="w-3.5 h-3.5 text-indigo-400" />
-              <span className="font-semibold">{currentTeacher.role}</span>
-              <span className="text-[11px] text-slate-400">({currentTeacher.department})</span>
+              <span className="font-semibold">{currentTeacher?.role || 'คุณครู'}</span>
+              <span className="text-[11px] text-slate-400">({currentTeacher?.department || 'การสอน'})</span>
             </div>
           )}
 
@@ -423,17 +442,24 @@ export const Navbar: React.FC<NavbarProps> = ({
             )}
           </div>
 
-          {/* Quick Code Exporter / GAS Modal Button */}
+          {/* Google Sheets / GAS Database Button */}
           <button
             onClick={() => {
               playSound('click');
               onOpenGasModal();
             }}
-            className={`flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 bg-gradient-to-r from-amber-500/20 to-orange-500/20 hover:from-amber-500/30 hover:to-orange-500/30 border border-amber-500/40 text-amber-300 text-xs font-semibold ${getButtonRadiusClass()} transition-all shadow-sm cursor-pointer`}
-            title="เปิดดูและดาวน์โหลดโค้ด Google Apps Script (13 ไฟล์)"
+            className={`flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 border text-xs font-semibold ${getButtonRadiusClass()} transition-all shadow-sm cursor-pointer ${
+              isGasConnected
+                ? 'bg-emerald-500/20 hover:bg-emerald-500/30 border-emerald-500/50 text-emerald-300'
+                : 'bg-gradient-to-r from-amber-500/20 to-orange-500/20 hover:from-amber-500/30 hover:to-orange-500/30 border-amber-500/40 text-amber-300'
+            }`}
+            title="ตั้งค่าเชื่อมต่อฐานข้อมูล Google Sheets / Google Apps Script"
           >
-            <FileCode2 className="w-3.5 h-3.5 text-amber-400" />
-            <span className="hidden md:inline">โค้ด GAS</span>
+            <Database className={`w-3.5 h-3.5 ${isGasConnected ? 'text-emerald-400' : 'text-amber-400'}`} />
+            <span className="hidden md:inline">
+              {isGasConnected ? 'Google Sheets (เชื่อมต่อแล้ว)' : 'เชื่อม Google Sheets'}
+            </span>
+            <span className={`w-2 h-2 rounded-full ${isGasConnected ? 'bg-emerald-400 animate-pulse' : 'bg-amber-400'}`} />
           </button>
 
           {/* Quick Theme Customizer Button */}
@@ -472,16 +498,16 @@ export const Navbar: React.FC<NavbarProps> = ({
               className="flex items-center gap-2 p-1.5 sm:pr-3 rounded-2xl bg-slate-800 hover:bg-slate-700/80 border border-slate-700 transition-all text-left cursor-pointer"
             >
               <div className="w-7 h-7 rounded-xl bg-indigo-600/30 text-white flex items-center justify-center text-sm border border-indigo-500/30">
-                {role === 'student' ? currentStudent.avatar : '🎓'}
+                {role === 'student' ? (currentStudent?.avatar || '🌱') : '🎓'}
               </div>
               <div className="hidden sm:block text-left leading-tight">
                 <div className="text-xs font-bold text-white truncate max-w-[100px]">
                   {role === 'student'
-                    ? `${currentStudent.firstName}`
-                    : `${currentTeacher.prefix}${currentTeacher.firstName}`}
+                    ? `${currentStudent?.firstName || 'นักเรียน'}`
+                    : `${currentTeacher?.prefix || 'ครู'}${currentTeacher?.firstName || ''}`}
                 </div>
                 <div className="text-[10px] text-slate-400">
-                  {role === 'student' ? currentStudent.classroom : currentTeacher.role}
+                  {role === 'student' ? (currentStudent?.classroom || 'ห้องเรียน') : (currentTeacher?.role || 'คุณครู')}
                 </div>
               </div>
               <ChevronDown className="w-3.5 h-3.5 text-slate-400" />
@@ -539,7 +565,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                             triggerMascotTip(`สลับเป็น ${t.prefix}${t.firstName} ${t.lastName} (${t.role}) แล้วครับ!`, 'happy');
                           }}
                           className={`w-full text-left p-2 rounded-xl text-xs flex items-center justify-between cursor-pointer ${
-                            currentTeacher.teacherId === t.teacherId
+                            currentTeacher?.teacherId === t.teacherId
                               ? 'bg-indigo-600/30 text-indigo-300 border border-indigo-500/40 font-semibold'
                               : 'hover:bg-slate-800 text-slate-300'
                           }`}
@@ -549,7 +575,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                             {t.firstName} {t.lastName}
                             <div className="text-[10px] text-slate-400">{t.role} ({t.department})</div>
                           </div>
-                          {currentTeacher.teacherId === t.teacherId && (
+                          {currentTeacher?.teacherId === t.teacherId && (
                             <span className="text-emerald-400 text-xs">✓</span>
                           )}
                         </button>
@@ -572,7 +598,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                             triggerMascotTip(`สลับเป็น ${s.prefix}${s.firstName} (${s.classroom}) เรียบร้อย!`, 'happy');
                           }}
                           className={`w-full text-left p-2 rounded-xl text-xs flex items-center justify-between cursor-pointer ${
-                            currentStudent.id === s.id
+                            currentStudent?.id === s.id
                               ? 'bg-indigo-600/30 text-indigo-300 border border-indigo-500/40 font-semibold'
                               : 'hover:bg-slate-800 text-slate-300'
                           }`}
@@ -588,7 +614,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                               </div>
                             </div>
                           </div>
-                          {currentStudent.id === s.id && (
+                          {currentStudent?.id === s.id && (
                             <span className="text-emerald-400 text-xs">✓</span>
                           )}
                         </button>
@@ -596,6 +622,20 @@ export const Navbar: React.FC<NavbarProps> = ({
                     </div>
                   </>
                 )}
+
+                {/* Logout Button */}
+                <div className="pt-2 mt-2 border-t border-slate-800">
+                  <button
+                    onClick={() => {
+                      setShowAccountDropdown(false);
+                      logout();
+                    }}
+                    className="w-full py-2 px-3 rounded-xl bg-rose-950/40 hover:bg-rose-900/60 border border-rose-800/50 text-rose-300 font-bold text-xs flex items-center justify-center gap-2 transition-colors cursor-pointer"
+                  >
+                    <LogOut className="w-3.5 h-3.5" />
+                    <span>ออกจากระบบ (Logout)</span>
+                  </button>
+                </div>
               </div>
             )}
           </div>
@@ -716,6 +756,13 @@ export const Navbar: React.FC<NavbarProps> = ({
           </>
         )}
       </div>
+
+      {/* Teacher PIN Modal for Role Switch */}
+      <TeacherPinModal
+        isOpen={isTeacherPinModalOpen}
+        onClose={() => setIsTeacherPinModalOpen(false)}
+        onSuccess={handleTeacherPinSuccess}
+      />
     </header>
   );
 };

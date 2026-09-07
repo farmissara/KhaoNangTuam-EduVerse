@@ -21,7 +21,18 @@ interface CertificateViewerProps {
 
 export const CertificateViewer: React.FC<CertificateViewerProps> = ({ onBack }) => {
   const { currentStudent, certificates, answerLogs, subjects, playSound, theme } = useApp();
-  const [selectedCert, setSelectedCert] = useState<CertificateTemplate>(certificates[0]);
+  const fallbackCert: CertificateTemplate = certificates[0] || {
+    id: 'CERT_FALLBACK',
+    title: 'เกียรติบัตรเรียนรู้ยอดเยี่ยม',
+    subjectId: 'SUB_GENERAL',
+    subjectName: 'ความรู้ทั่วไป',
+    minScorePercent: 70,
+    issueDate: '2026-03-31',
+    teacherSignName: 'ดร.วิชาการ สถาพร',
+    schoolName: 'โรงเรียนเอ็ดดูเควสท์วิทยาคม',
+    serialNumber: 'EQ-2026-0001'
+  };
+  const [selectedCert, setSelectedCert] = useState<CertificateTemplate>(fallbackCert);
   const certRef = useRef<HTMLDivElement>(null);
 
   const isLightTheme = [
@@ -33,14 +44,16 @@ export const CertificateViewer: React.FC<CertificateViewerProps> = ({ onBack }) 
     'lavender-dream'
   ].includes(theme.background);
 
+  const activeCert = selectedCert || fallbackCert;
+
   // Calculate student performance in this certificate's subject
   const studentLogs = answerLogs.filter(
-    l => l.studentId === currentStudent.id && l.subjectId === selectedCert.subjectId
+    l => l.studentId === currentStudent?.id && l.subjectId === activeCert.subjectId
   );
   const total = studentLogs.length;
   const correct = studentLogs.filter(l => l.isCorrect).length;
-  const studentAccuracy = total > 0 ? Math.round((correct / total) * 100) : currentStudent.accuracy;
-  const isEligible = studentAccuracy >= selectedCert.minScorePercent;
+  const studentAccuracy = total > 0 ? Math.round((correct / total) * 100) : (currentStudent?.accuracy || 0);
+  const isEligible = studentAccuracy >= activeCert.minScorePercent;
 
   const handlePrint = () => {
     playSound('click');
@@ -69,7 +82,7 @@ export const CertificateViewer: React.FC<CertificateViewerProps> = ({ onBack }) 
               </span>
             </div>
             <p className="text-xs text-slate-400 mt-1">
-              ทำคะแนนความถูกต้องเกิน {selectedCert.minScorePercent}% ในแต่ละรายวิชาเพื่อปลดล็อกและพิมพ์ใบประกาศนียบัตร
+              ทำคะแนนความถูกต้องเกิน {activeCert.minScorePercent}% ในแต่ละรายวิชาเพื่อปลดล็อกและพิมพ์ใบประกาศนียบัตร
             </p>
           </div>
         </div>
@@ -184,7 +197,7 @@ export const CertificateViewer: React.FC<CertificateViewerProps> = ({ onBack }) 
                 🏛️
               </div>
               <h3 className="text-sm sm:text-base font-bold text-amber-900 tracking-wider">
-                {selectedCert.schoolName}
+                {activeCert.schoolName}
               </h3>
               <p className="text-xs text-amber-800/80">ระบบประเมินและคลังข้อสอบเกมการศึกษาอัจฉริยะ (EduQuest)</p>
             </div>
@@ -195,29 +208,29 @@ export const CertificateViewer: React.FC<CertificateViewerProps> = ({ onBack }) 
                 CERTIFICATE OF ACHIEVEMENT
               </div>
               <h2 className="text-xl sm:text-2xl font-black text-amber-950 font-serif">
-                {selectedCert.title}
+                {activeCert.title}
               </h2>
               <p className="text-xs text-slate-600">ขอมอบเกียรติบัตรฉบับนี้เพื่อแสดงว่า</p>
 
               {/* Student Name */}
               <div className="py-2">
                 <div className="text-xl sm:text-2xl font-black text-indigo-950 border-b-2 border-dashed border-amber-400 inline-block px-8 py-1">
-                  {currentStudent.prefix}{currentStudent.firstName} {currentStudent.lastName}
+                  {currentStudent?.prefix || 'ด.ช.'}{currentStudent?.firstName || 'นักเรียน'} {currentStudent?.lastName || ''}
                 </div>
                 <div className="text-xs text-slate-600 mt-1">
-                  ชั้นมัธยมศึกษาปีที่ {currentStudent.classroom} (เลขที่ {currentStudent.number})
+                  ชั้นมัธยมศึกษาปีที่ {currentStudent?.classroom || 'ม.1/1'} (เลขที่ {currentStudent?.number || 1})
                 </div>
               </div>
 
               <p className="text-xs text-slate-700 max-w-md mx-auto leading-relaxed">
-                ได้ผ่านการประเมินองค์ความรู้และทักษะในวิชา <b>{selectedCert.subjectName}</b> ด้วยผลคะแนนยอดเยี่ยม {studentAccuracy}%
+                ได้ผ่านการประเมินองค์ความรู้และทักษะในวิชา <b>{activeCert.subjectName}</b> ด้วยผลคะแนนยอดเยี่ยม {studentAccuracy}%
               </p>
             </div>
 
             {/* Bottom Signatures & Serial */}
             <div className="pt-6 border-t border-amber-300 relative z-10 flex flex-col sm:flex-row items-center justify-between gap-4 text-center sm:text-left text-xs text-slate-700">
               <div>
-                <div className="font-bold text-slate-900">{selectedCert.teacherSignName}</div>
+                <div className="font-bold text-slate-900">{activeCert.teacherSignName}</div>
                 <div className="text-[11px] text-slate-500">ครูผู้สอน / หัวหน้ากลุ่มสาระฯ</div>
               </div>
 
@@ -228,8 +241,8 @@ export const CertificateViewer: React.FC<CertificateViewerProps> = ({ onBack }) 
               </div>
 
               <div className="text-right">
-                <div>วันที่ออก: <span className="font-semibold">{selectedCert.issueDate}</span></div>
-                <div className="text-[10px] font-mono text-slate-400">เลขที่: {selectedCert.serialNumber}</div>
+                <div>วันที่ออก: <span className="font-semibold">{activeCert.issueDate}</span></div>
+                <div className="text-[10px] font-mono text-slate-400">เลขที่: {activeCert.serialNumber}</div>
               </div>
             </div>
           </div>
