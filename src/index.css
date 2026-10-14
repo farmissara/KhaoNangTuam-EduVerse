@@ -193,3 +193,108 @@
 ::-webkit-scrollbar-thumb:hover {
   background: rgba(100, 116, 139, 0.55);
 }
+
+/* ==========================================================
+   EduVerse Premium Admin UI
+   Scoped to authenticated teacher/admin experience only.
+   Student portal and game screens are intentionally excluded.
+   Visual-only overrides: do not alter component behavior.
+   ========================================================== */
+.eduverse-premium-admin {
+  --eduverse-ink: #0b1220;
+  --eduverse-panel: rgba(17, 27, 43, 0.88);
+  --eduverse-panel-raised: rgba(23, 35, 53, 0.94);
+  --eduverse-line: rgba(203, 213, 225, 0.14);
+  --eduverse-gold: #d7b878;
+  --eduverse-muted: #a6b1c2;
+  color: #e8edf5;
+  background:
+    radial-gradient(ellipse at 12% 0%, rgba(31, 76, 101, 0.24), transparent 42%),
+    radial-gradient(ellipse at 92% 8%, rgba(184, 146, 75, 0.10), transparent 34%),
+    linear-gradient(145deg, #080e19 0%, #0d1725 48%, #101b2a 100%) !important;
+  min-height: 100vh;
+}
+
+.eduverse-premium-admin main {
+  max-width: 90rem;
+  padding-top: clamp(1.25rem, 2.2vw, 2rem);
+  padding-bottom: clamp(2rem, 3vw, 3rem);
+}
+
+.eduverse-premium-admin header {
+  background: rgba(8, 14, 25, 0.88) !important;
+  border-color: var(--eduverse-line) !important;
+  box-shadow: 0 12px 36px rgba(0, 0, 0, 0.18) !important;
+  backdrop-filter: blur(22px);
+}
+
+.eduverse-premium-admin footer {
+  background: rgba(8, 14, 25, 0.72) !important;
+  border-color: var(--eduverse-line) !important;
+}
+
+.eduverse-premium-admin main [class*="bg-slate-950"],
+.eduverse-premium-admin main [class*="bg-slate-900"],
+.eduverse-premium-admin main [class*="bg-slate-800"] {
+  background-color: var(--eduverse-panel) !important;
+}
+
+.eduverse-premium-admin main [class*="bg-slate-700"] {
+  background-color: var(--eduverse-panel-raised) !important;
+}
+
+.eduverse-premium-admin main [class*="border-slate-800"],
+.eduverse-premium-admin main [class*="border-slate-700"],
+.eduverse-premium-admin main [class*="border-slate-600"] {
+  border-color: var(--eduverse-line) !important;
+}
+
+.eduverse-premium-admin main [class*="rounded-"][class*="border"] {
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.12);
+}
+
+.eduverse-premium-admin main [class*="text-slate-400"],
+.eduverse-premium-admin main [class*="text-slate-500"] {
+  color: var(--eduverse-muted) !important;
+}
+
+.eduverse-premium-admin main [class*="border-amber-"],
+.eduverse-premium-admin main [class*="border-yellow-"] {
+  border-color: rgba(215, 184, 120, 0.42) !important;
+}
+
+.eduverse-premium-admin main [class*="text-amber-"],
+.eduverse-premium-admin main [class*="text-yellow-"] {
+  color: var(--eduverse-gold) !important;
+}
+
+.eduverse-premium-admin main input,
+.eduverse-premium-admin main select,
+.eduverse-premium-admin main textarea {
+  color: #edf2f8;
+  border-color: var(--eduverse-line);
+}
+
+.eduverse-premium-admin main input::placeholder,
+.eduverse-premium-admin main textarea::placeholder {
+  color: #8491a5;
+}
+
+.eduverse-premium-admin main button {
+  transition: background-color 180ms ease, border-color 180ms ease, box-shadow 180ms ease, transform 180ms ease;
+}
+
+.eduverse-premium-admin main button:focus-visible,
+.eduverse-premium-admin main a:focus-visible,
+.eduverse-premium-admin header button:focus-visible {
+  outline: 2px solid var(--eduverse-gold);
+  outline-offset: 3px;
+}
+
+@media (max-width: 640px) {
+  .eduverse-premium-admin main {
+    padding-left: 0.875rem;
+    padding-right: 0.875rem;
+  }
+}
+
