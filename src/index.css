@@ -1,218 +1,131 @@
 @import "tailwindcss";
 
+/*
+ * EduVerse — single source of truth for global CSS and teacher/admin visual tokens.
+ * Keep visual overrides here. React components retain their existing behavior.
+ * Teacher/admin styling is scoped to .eduverse-premium-admin; student and game
+ * screens are intentionally not themed by these rules.
+ */
+
 @layer base {
   :root {
     --sat: env(safe-area-inset-top, 0px);
     --sar: env(safe-area-inset-right, 0px);
     --sab: env(safe-area-inset-bottom, 0px);
     --sal: env(safe-area-inset-left, 0px);
+
+    /* Global layout tokens */
+    --eduverse-font-fallback: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
   }
 
-  html, body {
-    font-family: 'Prompt', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  html,
+  body {
+    font-family: "Prompt", var(--eduverse-font-fallback);
     -webkit-tap-highlight-color: transparent;
     -webkit-touch-callout: none;
     touch-action: manipulation;
     overflow-x: hidden;
   }
+
+  button,
+  input,
+  select,
+  textarea {
+    font: inherit;
+  }
+
+  :focus-visible {
+    outline-offset: 3px;
+  }
 }
 
-/* iOS Safe Area Padding Utilities */
-.pt-safe {
-  padding-top: env(safe-area-inset-top, 0px);
-}
-.pb-safe {
-  padding-bottom: env(safe-area-inset-bottom, 0px);
-}
-.pl-safe {
-  padding-left: env(safe-area-inset-left, 0px);
-}
-.pr-safe {
-  padding-right: env(safe-area-inset-right, 0px);
-}
-.mb-safe {
-  margin-bottom: env(safe-area-inset-bottom, 0px);
-}
+/* Safe-area helpers retained for mobile layouts. */
+.pt-safe { padding-top: env(safe-area-inset-top, 0px); }
+.pb-safe { padding-bottom: env(safe-area-inset-bottom, 0px); }
+.pl-safe { padding-left: env(safe-area-inset-left, 0px); }
+.pr-safe { padding-right: env(safe-area-inset-right, 0px); }
+.mb-safe { margin-bottom: env(safe-area-inset-bottom, 0px); }
+.touch-manipulation { touch-action: manipulation; }
+.no-select { -webkit-user-select: none; user-select: none; }
 
-.touch-manipulation {
-  touch-action: manipulation;
-}
+/* Font choices used by the existing theme customizer. */
+.font-prompt { font-family: "Prompt", var(--eduverse-font-fallback); }
+.font-kanit { font-family: "Kanit", var(--eduverse-font-fallback); }
+.font-sarabun { font-family: "Sarabun", var(--eduverse-font-fallback); }
+.font-mitr { font-family: "Mitr", var(--eduverse-font-fallback); }
 
-.no-select {
-  -webkit-user-select: none;
-  user-select: none;
-}
-
-.font-prompt {
-  font-family: 'Prompt', -apple-system, sans-serif;
-}
-
-.font-kanit {
-  font-family: 'Kanit', -apple-system, sans-serif;
-}
-
-.font-sarabun {
-  font-family: 'Sarabun', -apple-system, sans-serif;
-}
-
-.font-mitr {
-  font-family: 'Mitr', -apple-system, sans-serif;
-}
-
-/* Custom animations and effects */
+/* Existing motion effects used across teacher, student and game screens. */
 @keyframes float {
-  0%, 100% { transform: translateY(0px) rotate(0deg); }
+  0%, 100% { transform: translateY(0) rotate(0); }
   50% { transform: translateY(-8px) rotate(1.5deg); }
 }
-
 @keyframes float-slow {
-  0%, 100% { transform: translateY(0px) rotate(0deg); }
+  0%, 100% { transform: translateY(0) rotate(0); }
   50% { transform: translateY(-12px) rotate(-1deg); }
 }
-
-@keyframes pulse-subtle {
-  0%, 100% { opacity: 1; transform: scale(1); }
-  50% { opacity: 0.85; transform: scale(1.03); }
-}
-
 @keyframes pulse-glow {
-  0%, 100% {
-    box-shadow: 0 0 15px rgba(99, 102, 241, 0.4), inset 0 0 10px rgba(99, 102, 241, 0.2);
-  }
-  50% {
-    box-shadow: 0 0 30px rgba(168, 85, 247, 0.7), inset 0 0 20px rgba(168, 85, 247, 0.4);
-  }
+  0%, 100% { box-shadow: 0 0 15px rgba(99, 102, 241, .4), inset 0 0 10px rgba(99, 102, 241, .2); }
+  50% { box-shadow: 0 0 30px rgba(168, 85, 247, .7), inset 0 0 20px rgba(168, 85, 247, .4); }
 }
-
-@keyframes pulse-gold {
-  0%, 100% {
-    box-shadow: 0 0 10px rgba(245, 158, 11, 0.4);
-  }
-  50% {
-    box-shadow: 0 0 25px rgba(245, 158, 11, 0.8);
-  }
-}
-
 @keyframes wiggle {
-  0%, 100% { transform: rotate(0deg); }
+  0%, 100% { transform: rotate(0); }
   25% { transform: rotate(-5deg); }
   75% { transform: rotate(5deg); }
 }
-
 @keyframes shimmer {
   0% { transform: translateX(-100%); }
   100% { transform: translateX(200%); }
 }
-
 @keyframes pop-in {
-  0% { transform: scale(0.85); opacity: 0; }
+  0% { transform: scale(.85); opacity: 0; }
   70% { transform: scale(1.05); }
   100% { transform: scale(1); opacity: 1; }
 }
-
 @keyframes float-up-fade {
-  0% { transform: translateY(0) scale(0.9); opacity: 0; }
+  0% { transform: translateY(0) scale(.9); opacity: 0; }
   20% { transform: translateY(-8px) scale(1.1); opacity: 1; }
   80% { transform: translateY(-28px) scale(1); opacity: 1; }
-  100% { transform: translateY(-40px) scale(0.9); opacity: 0; }
+  100% { transform: translateY(-40px) scale(.9); opacity: 0; }
 }
 
-.animate-float {
-  animation: float 3.5s ease-in-out infinite;
-}
-
-.animate-float-slow {
-  animation: float-slow 5s ease-in-out infinite;
-}
-
-.animate-wiggle {
-  animation: wiggle 0.6s ease-in-out infinite;
-}
-
-.animate-pulse-subtle {
-  animation: pulse-subtle 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
-}
-
-.animate-pulse-glow {
-  animation: pulse-glow 2.5s ease-in-out infinite;
-}
-
-.animate-pulse-gold {
-  animation: pulse-gold 2s ease-in-out infinite;
-}
-
-.animate-pop-in {
-  animation: pop-in 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
-}
-
-.animate-shimmer {
-  position: relative;
-  overflow: hidden;
-}
+.animate-float { animation: float 3.5s ease-in-out infinite; }
+.animate-float-slow { animation: float-slow 5s ease-in-out infinite; }
+.animate-wiggle { animation: wiggle .6s ease-in-out infinite; }
+.animate-pulse-glow { animation: pulse-glow 2.5s ease-in-out infinite; }
+.animate-pop-in { animation: pop-in .4s cubic-bezier(.175, .885, .32, 1.275) forwards; }
+.animate-shimmer { position: relative; overflow: hidden; }
 .animate-shimmer::after {
-  content: '';
+  content: "";
   position: absolute;
-  top: 0;
-  left: 0;
+  inset: 0 auto 0 0;
   width: 50%;
-  height: 100%;
-  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.35), transparent);
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, .35), transparent);
   animation: shimmer 2s infinite;
 }
 
-/* Online Game Floating XP/Coin effect */
-.game-xp-bubble {
-  animation: float-up-fade 1.5s cubic-bezier(0.25, 1, 0.5, 1) forwards;
-}
+/* Scrollbars */
+::-webkit-scrollbar { width: 8px; height: 8px; }
+::-webkit-scrollbar-track { background: rgba(0, 0, 0, .04); }
+::-webkit-scrollbar-thumb { background: rgba(100, 116, 139, .35); border-radius: 4px; }
+::-webkit-scrollbar-thumb:hover { background: rgba(100, 116, 139, .55); }
 
-/* Light / Dark Mode transition helpers */
-.theme-light-card {
-  background-color: rgba(255, 255, 255, 0.92);
-  border-color: #e2e8f0;
-  color: #1e293b;
-  box-shadow: 0 10px 25px -5px rgba(148, 163, 184, 0.2), 0 8px 10px -6px rgba(148, 163, 184, 0.15);
-}
-
-.theme-light-card-hover:hover {
-  border-color: #818cf8;
-  box-shadow: 0 20px 25px -5px rgba(99, 102, 241, 0.15), 0 8px 10px -6px rgba(99, 102, 241, 0.1);
-}
-
-/* Custom scrollbars */
-::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
-}
-::-webkit-scrollbar-track {
-  background: rgba(0, 0, 0, 0.04);
-}
-::-webkit-scrollbar-thumb {
-  background: rgba(100, 116, 139, 0.35);
-  border-radius: 4px;
-}
-::-webkit-scrollbar-thumb:hover {
-  background: rgba(100, 116, 139, 0.55);
-}
-
-/* ==========================================================
-   EduVerse Premium Admin UI
-   Scoped to authenticated teacher/admin experience only.
-   Student portal and game screens are intentionally excluded.
-   Visual-only overrides: do not alter component behavior.
-   ========================================================== */
+/*
+ * Teacher/admin design system — edit these variables to change the look globally.
+ * Theme background and font selections remain controlled by the existing app settings.
+ */
 .eduverse-premium-admin {
-  --eduverse-ink: #0b1220;
-  --eduverse-panel: rgba(17, 27, 43, 0.88);
-  --eduverse-panel-raised: rgba(23, 35, 53, 0.94);
-  --eduverse-line: rgba(203, 213, 225, 0.14);
-  --eduverse-gold: #d7b878;
-  --eduverse-muted: #a6b1c2;
-  color: #e8edf5;
-  background:
-    radial-gradient(ellipse at 12% 0%, rgba(31, 76, 101, 0.24), transparent 42%),
-    radial-gradient(ellipse at 92% 8%, rgba(184, 146, 75, 0.10), transparent 34%),
-    linear-gradient(145deg, #080e19 0%, #0d1725 48%, #101b2a 100%) !important;
-  min-height: 100vh;
+  --eduverse-page-ink: #e9eef6;
+  --eduverse-surface: rgba(15, 25, 40, .94);
+  --eduverse-surface-raised: rgba(21, 34, 52, .97);
+  --eduverse-surface-subtle: rgba(10, 18, 30, .72);
+  --eduverse-border: rgba(178, 194, 214, .16);
+  --eduverse-border-strong: rgba(178, 194, 214, .25);
+  --eduverse-text: #e9eef6;
+  --eduverse-text-muted: #a4b0c2;
+  --eduverse-accent: #d7b878;
+  --eduverse-accent-soft: rgba(215, 184, 120, .14);
+  --eduverse-shadow: 0 16px 40px rgba(2, 8, 18, .18);
+  color: var(--eduverse-page-ink);
 }
 
 .eduverse-premium-admin main {
@@ -221,80 +134,88 @@
   padding-bottom: clamp(2rem, 3vw, 3rem);
 }
 
+/* Shared chrome: navbar and footer */
 .eduverse-premium-admin header {
-  background: rgba(8, 14, 25, 0.88) !important;
-  border-color: var(--eduverse-line) !important;
-  box-shadow: 0 12px 36px rgba(0, 0, 0, 0.18) !important;
+  border-color: var(--eduverse-border) !important;
+  box-shadow: 0 12px 36px rgba(0, 0, 0, .18);
   backdrop-filter: blur(22px);
 }
-
 .eduverse-premium-admin footer {
-  background: rgba(8, 14, 25, 0.72) !important;
-  border-color: var(--eduverse-line) !important;
+  border-color: var(--eduverse-border) !important;
 }
 
+/* Standardize card surfaces across all teacher/admin tools, including gradient cards. */
+.eduverse-premium-admin main [class*="rounded-"][class*="border"][class*="shadow-"][class*="bg-slate-"],
+.eduverse-premium-admin main [class*="rounded-"][class*="border"][class*="shadow-"][class*="bg-gradient-to-"] {
+  border-color: var(--eduverse-border) !important;
+  box-shadow: var(--eduverse-shadow);
+}
 .eduverse-premium-admin main [class*="bg-slate-950"],
 .eduverse-premium-admin main [class*="bg-slate-900"],
 .eduverse-premium-admin main [class*="bg-slate-800"] {
-  background-color: var(--eduverse-panel) !important;
+  background-color: var(--eduverse-surface) !important;
 }
-
 .eduverse-premium-admin main [class*="bg-slate-700"] {
-  background-color: var(--eduverse-panel-raised) !important;
+  background-color: var(--eduverse-surface-raised) !important;
 }
-
 .eduverse-premium-admin main [class*="border-slate-800"],
 .eduverse-premium-admin main [class*="border-slate-700"],
 .eduverse-premium-admin main [class*="border-slate-600"] {
-  border-color: var(--eduverse-line) !important;
+  border-color: var(--eduverse-border) !important;
 }
-
-.eduverse-premium-admin main [class*="rounded-"][class*="border"] {
-  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.12);
-}
-
 .eduverse-premium-admin main [class*="text-slate-400"],
 .eduverse-premium-admin main [class*="text-slate-500"] {
-  color: var(--eduverse-muted) !important;
+  color: var(--eduverse-text-muted) !important;
 }
-
 .eduverse-premium-admin main [class*="border-amber-"],
 .eduverse-premium-admin main [class*="border-yellow-"] {
-  border-color: rgba(215, 184, 120, 0.42) !important;
+  border-color: color-mix(in srgb, var(--eduverse-accent) 42%, transparent) !important;
 }
-
 .eduverse-premium-admin main [class*="text-amber-"],
 .eduverse-premium-admin main [class*="text-yellow-"] {
-  color: var(--eduverse-gold) !important;
+  color: var(--eduverse-accent) !important;
 }
 
+/* Form controls */
 .eduverse-premium-admin main input,
 .eduverse-premium-admin main select,
 .eduverse-premium-admin main textarea {
-  color: #edf2f8;
-  border-color: var(--eduverse-line);
+  color: var(--eduverse-text);
+  border-color: var(--eduverse-border-strong);
 }
-
 .eduverse-premium-admin main input::placeholder,
 .eduverse-premium-admin main textarea::placeholder {
-  color: #8491a5;
+  color: var(--eduverse-text-muted);
 }
-
-.eduverse-premium-admin main button {
-  transition: background-color 180ms ease, border-color 180ms ease, box-shadow 180ms ease, transform 180ms ease;
-}
-
+.eduverse-premium-admin main input:focus-visible,
+.eduverse-premium-admin main select:focus-visible,
+.eduverse-premium-admin main textarea:focus-visible,
 .eduverse-premium-admin main button:focus-visible,
 .eduverse-premium-admin main a:focus-visible,
 .eduverse-premium-admin header button:focus-visible {
-  outline: 2px solid var(--eduverse-gold);
+  outline: 2px solid var(--eduverse-accent);
   outline-offset: 3px;
 }
 
+/* Consistent, reduced-motion-aware interaction feedback. */
+.eduverse-premium-admin main button {
+  transition: background-color 180ms ease, border-color 180ms ease, box-shadow 180ms ease, transform 180ms ease;
+}
 @media (max-width: 640px) {
   .eduverse-premium-admin main {
-    padding-left: 0.875rem;
-    padding-right: 0.875rem;
+    padding-left: .875rem;
+    padding-right: .875rem;
   }
 }
-
+@media (prefers-reduced-motion: reduce) {
+  .animate-float,
+  .animate-float-slow,
+  .animate-wiggle,
+  .animate-pulse-glow,
+  .animate-pop-in,
+  .animate-shimmer,
+  .animate-shimmer::after {
+    animation-duration: .01ms !important;
+    animation-iteration-count: 1 !important;
+  }
+}
