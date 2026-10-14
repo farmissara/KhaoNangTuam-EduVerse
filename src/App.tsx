@@ -113,7 +113,7 @@ const MainAppContent: React.FC = () => {
 
   return (
     <div
-      className={`min-h-screen ${getThemeBackgroundClass(
+      className={`${isAuthenticated && role === 'teacher' ? 'eduverse-premium-admin' : ''} min-h-screen ${getThemeBackgroundClass(
         theme.background
       )} flex flex-col font-${theme.font} selection:bg-indigo-500 selection:text-white transition-colors duration-500 relative overflow-x-hidden`}
     >
