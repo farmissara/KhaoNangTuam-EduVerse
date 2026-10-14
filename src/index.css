@@ -9,11 +9,6 @@
 
 @layer base {
   :root {
-    --sat: env(safe-area-inset-top, 0px);
-    --sar: env(safe-area-inset-right, 0px);
-    --sab: env(safe-area-inset-bottom, 0px);
-    --sal: env(safe-area-inset-left, 0px);
-
     /* Global layout tokens */
     --eduverse-font-fallback: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
   }
@@ -39,14 +34,8 @@
   }
 }
 
-/* Safe-area helpers retained for mobile layouts. */
-.pt-safe { padding-top: env(safe-area-inset-top, 0px); }
-.pb-safe { padding-bottom: env(safe-area-inset-bottom, 0px); }
-.pl-safe { padding-left: env(safe-area-inset-left, 0px); }
-.pr-safe { padding-right: env(safe-area-inset-right, 0px); }
-.mb-safe { margin-bottom: env(safe-area-inset-bottom, 0px); }
+/* Touch behavior used by interactive game controls. */
 .touch-manipulation { touch-action: manipulation; }
-.no-select { -webkit-user-select: none; user-select: none; }
 
 /* Font choices used by the existing theme customizer. */
 .font-prompt { font-family: "Prompt", var(--eduverse-font-fallback); }
@@ -81,13 +70,6 @@
   70% { transform: scale(1.05); }
   100% { transform: scale(1); opacity: 1; }
 }
-@keyframes float-up-fade {
-  0% { transform: translateY(0) scale(.9); opacity: 0; }
-  20% { transform: translateY(-8px) scale(1.1); opacity: 1; }
-  80% { transform: translateY(-28px) scale(1); opacity: 1; }
-  100% { transform: translateY(-40px) scale(.9); opacity: 0; }
-}
-
 .animate-float { animation: float 3.5s ease-in-out infinite; }
 .animate-float-slow { animation: float-slow 5s ease-in-out infinite; }
 .animate-wiggle { animation: wiggle .6s ease-in-out infinite; }
@@ -117,13 +99,11 @@
   --eduverse-page-ink: #e9eef6;
   --eduverse-surface: rgba(15, 25, 40, .94);
   --eduverse-surface-raised: rgba(21, 34, 52, .97);
-  --eduverse-surface-subtle: rgba(10, 18, 30, .72);
   --eduverse-border: rgba(178, 194, 214, .16);
   --eduverse-border-strong: rgba(178, 194, 214, .25);
   --eduverse-text: #e9eef6;
   --eduverse-text-muted: #a4b0c2;
   --eduverse-accent: #d7b878;
-  --eduverse-accent-soft: rgba(215, 184, 120, .14);
   --eduverse-shadow: 0 16px 40px rgba(2, 8, 18, .18);
   color: var(--eduverse-page-ink);
 }
