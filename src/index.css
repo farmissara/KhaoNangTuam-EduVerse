@@ -108,20 +108,8 @@
    To change the entire teacher portal, edit the tokens below only.
    ========================================================================== */
 .eduverse-premium-admin {
-  --ev-page: #0b1220;
-  --ev-surface: #111c2d;
-  --ev-surface-raised: #17253a;
-  --ev-surface-soft: #1c2c42;
-  --ev-border: rgba(183, 198, 218, .15);
-  --ev-border-strong: rgba(183, 198, 218, .25);
-  --ev-text: #edf2f8;
-  --ev-text-muted: #a6b3c6;
-  --ev-accent: #d8bd82;
-  --ev-accent-hover: #ead29a;
-  --ev-radius: 1rem;
-  --ev-shadow: 0 14px 36px rgba(0, 0, 0, .18);
-  --ev-shadow-hover: 0 20px 44px rgba(0, 0, 0, .24);
   color: var(--ev-text);
+  background-color: var(--ev-page);
 }
 
 .eduverse-premium-admin main {
