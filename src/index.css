@@ -1,21 +1,34 @@
 @import "tailwindcss";
 
 /*
- * EduVerse — single source of truth for global CSS and teacher/admin visual tokens.
- * Keep visual overrides here. React components retain their existing behavior.
- * Teacher/admin styling is scoped to .eduverse-premium-admin; student and game
- * screens are intentionally not themed by these rules.
+ * EduVerse CSS entry point — the single place for visual design changes.
+ * Keep component behavior and utility classes in React; put shared visual tokens
+ * and teacher/admin overrides here. Student and game screens are not themed by
+ * the .eduverse-premium-admin scope.
  */
 
 @layer base {
   :root {
-    /* Global layout tokens */
-    --eduverse-font-fallback: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    --ev-font-fallback: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    --ev-font: "Prompt", var(--ev-font-fallback);
+    --ev-page: #0b1220;
+    --ev-surface: #111c2d;
+    --ev-surface-raised: #17253a;
+    --ev-surface-soft: #1c2c42;
+    --ev-border: rgba(183, 198, 218, .15);
+    --ev-border-strong: rgba(183, 198, 218, .25);
+    --ev-text: #edf2f8;
+    --ev-text-muted: #a6b3c6;
+    --ev-accent: #d8bd82;
+    --ev-accent-hover: #ead29a;
+    --ev-radius: 1rem;
+    --ev-shadow: 0 14px 36px rgba(0, 0, 0, .18);
+    --ev-shadow-hover: 0 20px 44px rgba(0, 0, 0, .24);
   }
 
   html,
   body {
-    font-family: "Prompt", var(--eduverse-font-fallback);
+    font-family: var(--ev-font);
     -webkit-tap-highlight-color: transparent;
     -webkit-touch-callout: none;
     touch-action: manipulation;
@@ -34,16 +47,15 @@
   }
 }
 
-/* Touch behavior used by interactive game controls. */
+/* Keep the existing font customizer working. */
+.font-prompt { font-family: "Prompt", var(--ev-font-fallback); }
+.font-kanit { font-family: "Kanit", var(--ev-font-fallback); }
+.font-sarabun { font-family: "Sarabun", var(--ev-font-fallback); }
+.font-mitr { font-family: "Mitr", var(--ev-font-fallback); }
+
+/* Used by existing interactive screens; these effects do not alter app logic. */
 .touch-manipulation { touch-action: manipulation; }
 
-/* Font choices used by the existing theme customizer. */
-.font-prompt { font-family: "Prompt", var(--eduverse-font-fallback); }
-.font-kanit { font-family: "Kanit", var(--eduverse-font-fallback); }
-.font-sarabun { font-family: "Sarabun", var(--eduverse-font-fallback); }
-.font-mitr { font-family: "Mitr", var(--eduverse-font-fallback); }
-
-/* Existing motion effects used across teacher, student and game screens. */
 @keyframes float {
   0%, 100% { transform: translateY(0) rotate(0); }
   50% { transform: translateY(-8px) rotate(1.5deg); }
@@ -91,81 +103,98 @@
 ::-webkit-scrollbar-thumb { background: rgba(100, 116, 139, .35); border-radius: 4px; }
 ::-webkit-scrollbar-thumb:hover { background: rgba(100, 116, 139, .55); }
 
-/*
- * Teacher/admin design system — edit these variables to change the look globally.
- * Theme background and font selections remain controlled by the existing app settings.
- */
+/* ==========================================================================
+   Teacher / admin design system
+   To change the entire teacher portal, edit the tokens below only.
+   ========================================================================== */
 .eduverse-premium-admin {
-  --eduverse-page-ink: #e9eef6;
-  --eduverse-surface: rgba(15, 25, 40, .94);
-  --eduverse-surface-raised: rgba(21, 34, 52, .97);
-  --eduverse-border: rgba(178, 194, 214, .16);
-  --eduverse-border-strong: rgba(178, 194, 214, .25);
-  --eduverse-text: #e9eef6;
-  --eduverse-text-muted: #a4b0c2;
-  --eduverse-accent: #d7b878;
-  --eduverse-shadow: 0 16px 40px rgba(2, 8, 18, .18);
-  color: var(--eduverse-page-ink);
+  --ev-page: #0b1220;
+  --ev-surface: #111c2d;
+  --ev-surface-raised: #17253a;
+  --ev-surface-soft: #1c2c42;
+  --ev-border: rgba(183, 198, 218, .15);
+  --ev-border-strong: rgba(183, 198, 218, .25);
+  --ev-text: #edf2f8;
+  --ev-text-muted: #a6b3c6;
+  --ev-accent: #d8bd82;
+  --ev-accent-hover: #ead29a;
+  --ev-radius: 1rem;
+  --ev-shadow: 0 14px 36px rgba(0, 0, 0, .18);
+  --ev-shadow-hover: 0 20px 44px rgba(0, 0, 0, .24);
+  color: var(--ev-text);
 }
 
 .eduverse-premium-admin main {
+  width: 100%;
   max-width: 90rem;
   padding-top: clamp(1.25rem, 2.2vw, 2rem);
   padding-bottom: clamp(2rem, 3vw, 3rem);
 }
 
-/* Shared chrome: navbar and footer */
-.eduverse-premium-admin header {
-  border-color: var(--eduverse-border) !important;
-  box-shadow: 0 12px 36px rgba(0, 0, 0, .18);
-  backdrop-filter: blur(22px);
-}
+/* Shared navigation/footer chrome */
+.eduverse-premium-admin header,
 .eduverse-premium-admin footer {
-  border-color: var(--eduverse-border) !important;
+  border-color: var(--ev-border) !important;
+  backdrop-filter: blur(20px);
+}
+.eduverse-premium-admin header {
+  box-shadow: 0 12px 32px rgba(0, 0, 0, .16);
 }
 
-/* Standardize card surfaces across all teacher/admin tools, including gradient cards. */
-.eduverse-premium-admin main [class*="rounded-"][class*="border"][class*="shadow-"][class*="bg-slate-"],
-.eduverse-premium-admin main [class*="rounded-"][class*="border"][class*="shadow-"][class*="bg-gradient-to-"] {
-  border-color: var(--eduverse-border) !important;
-  box-shadow: var(--eduverse-shadow);
+/* Card surfaces: catches both solid and gradient Tailwind cards. */
+.eduverse-premium-admin main [class*="rounded-"][class*="border"][class*="shadow-"] {
+  border-color: var(--ev-border) !important;
+  border-radius: var(--ev-radius);
+  box-shadow: var(--ev-shadow);
 }
+.eduverse-premium-admin main [class*="rounded-"][class*="border"][class*="shadow-"]:hover {
+  border-color: var(--ev-border-strong) !important;
+}
+.eduverse-premium-admin main [class*="bg-gradient-to-"][class*="rounded-"][class*="border"] {
+  background-image: none !important;
+  background-color: var(--ev-surface) !important;
+}
+
+/* Normalize common slate utility surfaces while preserving status colors. */
 .eduverse-premium-admin main [class*="bg-slate-950"],
 .eduverse-premium-admin main [class*="bg-slate-900"],
 .eduverse-premium-admin main [class*="bg-slate-800"] {
-  background-color: var(--eduverse-surface) !important;
+  background-color: var(--ev-surface) !important;
 }
-.eduverse-premium-admin main [class*="bg-slate-700"] {
-  background-color: var(--eduverse-surface-raised) !important;
+.eduverse-premium-admin main [class*="bg-slate-700"],
+.eduverse-premium-admin main [class*="bg-slate-600"] {
+  background-color: var(--ev-surface-raised) !important;
 }
+.eduverse-premium-admin main [class*="border-slate-950"],
+.eduverse-premium-admin main [class*="border-slate-900"],
 .eduverse-premium-admin main [class*="border-slate-800"],
 .eduverse-premium-admin main [class*="border-slate-700"],
 .eduverse-premium-admin main [class*="border-slate-600"] {
-  border-color: var(--eduverse-border) !important;
+  border-color: var(--ev-border) !important;
 }
 .eduverse-premium-admin main [class*="text-slate-400"],
 .eduverse-premium-admin main [class*="text-slate-500"] {
-  color: var(--eduverse-text-muted) !important;
-}
-.eduverse-premium-admin main [class*="border-amber-"],
-.eduverse-premium-admin main [class*="border-yellow-"] {
-  border-color: color-mix(in srgb, var(--eduverse-accent) 42%, transparent) !important;
+  color: var(--ev-text-muted) !important;
 }
 .eduverse-premium-admin main [class*="text-amber-"],
 .eduverse-premium-admin main [class*="text-yellow-"] {
-  color: var(--eduverse-accent) !important;
+  color: var(--ev-accent) !important;
+}
+.eduverse-premium-admin main [class*="border-amber-"],
+.eduverse-premium-admin main [class*="border-yellow-"] {
+  border-color: color-mix(in srgb, var(--ev-accent) 42%, transparent) !important;
 }
 
-/* Form controls */
+/* Inputs, selects, textareas and keyboard focus */
 .eduverse-premium-admin main input,
 .eduverse-premium-admin main select,
 .eduverse-premium-admin main textarea {
-  color: var(--eduverse-text);
-  border-color: var(--eduverse-border-strong);
+  color: var(--ev-text);
+  border-color: var(--ev-border-strong);
 }
 .eduverse-premium-admin main input::placeholder,
 .eduverse-premium-admin main textarea::placeholder {
-  color: var(--eduverse-text-muted);
+  color: var(--ev-text-muted);
 }
 .eduverse-premium-admin main input:focus-visible,
 .eduverse-premium-admin main select:focus-visible,
@@ -173,14 +202,19 @@
 .eduverse-premium-admin main button:focus-visible,
 .eduverse-premium-admin main a:focus-visible,
 .eduverse-premium-admin header button:focus-visible {
-  outline: 2px solid var(--eduverse-accent);
+  outline: 2px solid var(--ev-accent);
   outline-offset: 3px;
 }
 
-/* Consistent, reduced-motion-aware interaction feedback. */
+/* Consistent button feedback without overriding semantic success/error colors. */
 .eduverse-premium-admin main button {
   transition: background-color 180ms ease, border-color 180ms ease, box-shadow 180ms ease, transform 180ms ease;
 }
+.eduverse-premium-admin main button:hover {
+  border-color: var(--ev-border-strong);
+}
+
+/* Responsive layout */
 @media (max-width: 640px) {
   .eduverse-premium-admin main {
     padding-left: .875rem;
